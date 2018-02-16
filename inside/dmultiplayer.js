@@ -3650,7 +3650,7 @@ var dMultiplayer =
 								listitem.addClass("selectedFeature");
 								isTargetSelected = true;
 									
-								dMultiplayer.lawsuitSliders(tmin, tmin2);
+								dMultiplayer.lawsuitSliders(0);
 								
 								$("#lawsuitNextButton").removeClass("disabledButton").addClass("orangeButton").removeClass("baseButton").addClass("selectorButton");
 							}
@@ -3685,7 +3685,7 @@ var dMultiplayer =
 							$("#lawsuitType").find(".selectedFeature").removeClass("selectedFeature");
 							listitem.addClass("selectedFeature");
 							
-							dMultiplayer.lawsuitSliders(tmin, tmin2);
+							dMultiplayer.lawsuitSliders(0);
 							
 							if (isTargetSelected && $("#lawsuitNextButton").hasClass("disabledButton"))
 								$("#lawsuitNextButton").removeClass("disabledButton").addClass("orangeButton").removeClass("baseButton").addClass("selectorButton");
@@ -4553,17 +4553,7 @@ var dMultiplayer =
 			var competitor = competitors[competitorindex];
 			
 			var type = parseInt($("#lawsuitType").find(".selectedFeature").val());
-			
-			switch (type)
-			{
-				case 0:
-					type = "reqrp";
-					break;
-				
-				case 1:
-					type = "reqcash";
-			}
-			
+
 			var n = new Notification(
 			{
 				header: "{0} Lawsuit".dlocalize(modid).format(competitor.name),
@@ -4576,6 +4566,7 @@ var dMultiplayer =
 		}
 		else
 		{
+			dMultiplayer.log("debug", true);
 			UI.closeModal();
 			dMultiplayer.showLawsuitWindow();
 		}
@@ -4947,16 +4938,19 @@ var dMultiplayer =
 		}));
 	};
 	
-	dMultiplayer.lawsuitSliders = function(max)
+	dMultiplayer.lawsuitSliders = function(min)
 	{
 		$("#lawsuitCost").html("Cash:".dlocalize(modid) + " 0");
 		moneyToPay = 0;
-		
+		var max = GameManager.company.cash
 		if (isTargetSelected)
 		{
 			var index = dMultiplayer.getObjectArrayIndex(competitors, "id", parseInt($("#lawsuitTargets").find(".selectedFeature").val()));
 			
-			max = competitors[index].cash;
+			if (competitors[index]) {
+				max = competitors[index].cash;
+			}
+			
 			$("#lawsuitCashText").text("Cash (request)".dlocalize(modid));
 		}
 								
@@ -4965,7 +4959,7 @@ var dMultiplayer =
 		{
 			orientation: "horizontal",
 			range: "min",
-			min: 0,
+			min: min,
 			max: max,
 			value: 0,
 			animate: "fast",
