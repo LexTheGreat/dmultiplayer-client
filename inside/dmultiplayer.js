@@ -226,11 +226,11 @@ var dMultiplayer =
 		$('#gameUIContainer').append('<div id="gdtmpcard" style="width: 460px; height: 100px; position: absolute; font: 13.5px \'Segoe UI\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 40px; bottom: 40px; cursor: default; padding-left: 4px; padding-right: 4px; display: none; overflow: hidden;"></div>');
 		$('#gameUIContainer').append('<div id="gdtmpminimize" onmousedown="dMultiplayer.toggleListMinimized()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 460px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 4px 0px 0px 0px;">_</div>');
 		$('#gameUIContainer').append('<div id="gdtmpinfo" onmousedown="dMultiplayer.showInfoWindow()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 476px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px;">i</div>');
-		$('#gameUIContainer').append('<div id="gdtmpchat" onmousedown="dMultiplayer.toggleChat()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 492px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 0px 4px 0px 0px;"><img src="./mods_ws/dmultiplayer/img/chat.png" style="position: relative; top: 1px;" /></div>');
+		$('#gameUIContainer').append('<div id="gdtmpchat" onmousedown="dMultiplayer.toggleChat()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 492px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 0px 4px 0px 0px;"><img src="./mods/dmultiplayer/img/chat.png" style="position: relative; top: 1px;" /></div>');
 		
 		$('#gameUIContainer').append('<textarea id="chatArea" style="font-size: 8pt; width: 460px; height: 100px; position: absolute;border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 40px; bottom: 160px; cursor: default; padding-left: 4px; padding-right: 4px;display: none" readonly></textarea>'); // display: none;
-		$('#gameUIContainer').append('<input type="text" id="chatInput" maxlength="120" style="font-size: 6pt; width: 400px; height: 10px; position: absolute;left: 40px; bottom: 144px;display: none" />');
-		$('#gameUIContainer').append('<div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton" style="display: none;">' + 'Send Message'.dlocalize(modid) + '</div>'); // Used for time'n
+		$('#gameUIContainer').append('<input type="text" id="chatInput" maxlength="120" style="font-size: 12pt; width: 400px; height: 10px; position: absolute;left: 40px; bottom: 144px;display: none" />');
+		$('#gameUIContainer').append('<div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton" style="display: none;">' + 'Send Message'.dlocalize(modid) + '</div>');
 
 		$("#id_of_textbox").keyup(function(event) {
 			if (event.keyCode === 13) {
@@ -3276,7 +3276,7 @@ var dMultiplayer =
 				compinarr.indicatorimage = image;
 			}
 			
-			$("#gdtmpcard").append("<img src=\"./mods_ws/dmultiplayer/img/" + image + ".png\" style=\"width: auto; height: auto;\" /> " + compinarr.name + " <sup>("  + compinarr.boss + ")</sup> <span style=\"float: right\">" + "Cash:".dlocalize(modid) + " " + UI.getShortNumberString(compinarr.cash) + "&nbsp;&nbsp;&nbsp;" + "Fans:".dlocalize(modid) + " " + UI.getShortNumberString(compinarr.fans) + "</span><br />");
+			$("#gdtmpcard").append("<img src=\"./mods/dmultiplayer/img/" + image + ".png\" style=\"width: auto; height: auto;\" /> " + compinarr.name + " <sup>("  + compinarr.boss + ")</sup> <span style=\"float: right\">" + "Cash:".dlocalize(modid) + " " + UI.getShortNumberString(compinarr.cash) + "&nbsp;&nbsp;&nbsp;" + "Fans:".dlocalize(modid) + " " + UI.getShortNumberString(compinarr.fans) + "</span><br />");
 			compinarr.prevposition = i;
 		});
 		
@@ -3359,7 +3359,7 @@ var dMultiplayer =
 				$("#browserList").append("<tr style=\"background: #FFB437;\"><td style=\"width: 270px;\"><b>" + "Description".dlocalize(modid) + "</b></td><td style=\"width: 60px;\"><b>" + "Players".dlocalize(modid) + "</b></td><td style=\"width: 80px;\"><b>" + "Cheating".dlocalize(modid) + "</b></td><td style=\"width: 130px;\"><b>" + "IP Address".dlocalize(modid) + "</b></td></tr>");
 				
 
-			    $.get('./mods_ws/dmultiplayer/servers.txt', function (content)
+			    $.get('./mods/dmultiplayer/servers.txt', function (content)
 				{
 					var srvs = content.split(",");
 					if (srvs.length > 0 && srvs[0])
