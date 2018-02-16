@@ -1,8 +1,3 @@
-//Warning: reading this code as an experienced developer may cause you to bang your head against a wall
-//Yes, it's that bad, and I'm that bad of a developer
-//It's like a book with bad grammar... wait, what?
-//Anyway, I am not responsible for you being sent to the hospital because of my mod.
-
 var dMultiplayer =
 {
 	get allowCustomData()
@@ -13,6 +8,7 @@ var dMultiplayer =
 
 (function()
 {
+	var webSite = "http://GDevMP.foxgamingservers.com"; // Without / at end
 	var dmod;
 	var sep = "\xFA";
 	var sep2 = "\xFB";
@@ -3350,7 +3346,7 @@ var dMultiplayer =
 							dMultiplayer.pollServer(srvs[i], i);
 				}).fail(function()
 				{
-				    $.get("http://GDevMP.foxgamingservers.com/index.php", function (content) {
+				    $.get(webSite +"/index.php", function (content) {
 				        var srvs = content.split(",");
 				        if (srvs.length > 0 && srvs[0])
 				            for (var i = 0; i < srvs.length; i++)
@@ -4680,7 +4676,7 @@ var dMultiplayer =
 		var declinedUpdate = false;
 		var log = first ? "true" : "false";
 
-		$.get("http://gdevmp.foxgamingservers.com/cversion.php" + log, function(content)
+		$.get(webSite +"/cversion.php" + log, function(content)
 		{
 			if (!dMultiplayer.compareVersions(dmod.version, content, true))
 				confirm("A GDTMP update is available! ({0})\nGo to the official forum thread for more info and downloads?".dlocalize(modid).format(content)) ? PlatformShim.openUrlExternal(dmod.url) : declinedUpdate = true;
