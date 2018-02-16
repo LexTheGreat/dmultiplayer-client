@@ -229,8 +229,8 @@ var dMultiplayer =
 		$('#gameUIContainer').append('<div id="gdtmpchat" onmousedown="dMultiplayer.toggleChat()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 492px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 0px 4px 0px 0px;"><img src="./mods_ws/dmultiplayer/img/chat.png" style="position: relative; top: 1px;" /></div>');
 		
 		$('#gameUIContainer').append('<textarea id="chatArea" style="font-size: 8pt; width: 460px; height: 100px; position: absolute;border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 40px; bottom: 160px; cursor: default; padding-left: 4px; padding-right: 4px;display: none" readonly></textarea>'); // display: none;
-		$('#gameUIContainer').append('<input type="text" id="chatInput" maxlength="120" style="font-size: 12pt; width: 400px; height: 10px; position: absolute;left: 40px; bottom: 144px;display: none" />');
-		$('#gameUIContainer').append('<div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton" style="display: none;">' + 'Send Message'.dlocalize(modid) + '</div>');
+		$('#gameUIContainer').append('<input type="text" id="chatInput" maxlength="120" style="font-size: 6pt; width: 400px; height: 10px; position: absolute;left: 40px; bottom: 144px;display: none" />');
+		$('#gameUIContainer').append('<div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton" style="display: none;">' + 'Send Message'.dlocalize(modid) + '</div>'); // Used for time'n
 
 		$("#id_of_textbox").keyup(function(event) {
 			if (event.keyCode === 13) {
