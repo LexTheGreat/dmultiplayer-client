@@ -226,7 +226,22 @@ var dMultiplayer =
 		$('#gameUIContainer').append('<div id="gdtmpcard" style="width: 460px; height: 100px; position: absolute; font: 13.5px \'Segoe UI\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 40px; bottom: 40px; cursor: default; padding-left: 4px; padding-right: 4px; display: none; overflow: hidden;"></div>');
 		$('#gameUIContainer').append('<div id="gdtmpminimize" onmousedown="dMultiplayer.toggleListMinimized()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 460px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 4px 0px 0px 0px;">_</div>');
 		$('#gameUIContainer').append('<div id="gdtmpinfo" onmousedown="dMultiplayer.showInfoWindow()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 476px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px;">i</div>');
-		$('#gameUIContainer').append('<div id="gdtmpchat" onmousedown="dMultiplayer.showChatWindow()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 492px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 0px 4px 0px 0px;"><img src="./mods_ws/dmultiplayer/img/chat.png" style="position: relative; top: 1px;" /></div>');
+		$('#gameUIContainer').append('<div id="gdtmpchat" onmousedown="dMultiplayer.toggleChat()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 492px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 0px 4px 0px 0px;"><img src="./mods_ws/dmultiplayer/img/chat.png" style="position: relative; top: 1px;" /></div>');
+		
+		$('#gameUIContainer').append('<textarea id="chatArea" style="font-size: 8pt; width: 460px; height: 100px; position: absolute;border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 40px; bottom: 160px; cursor: default; padding-left: 4px; padding-right: 4px;display: none" readonly></textarea>'); // display: none;
+		$('#gameUIContainer').append('<input type="text" id="chatInput" maxlength="120" style="font-size: 12pt; width: 400px; height: 10px; position: absolute;left: 40px; bottom: 144px;display: none" />');
+		$('#gameUIContainer').append('<div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton" style="display: none;">' + 'Send Message'.dlocalize(modid) + '</div>');
+
+		$("#id_of_textbox").keyup(function(event) {
+			if (event.keyCode === 13) {
+				dMultiplayer.sendChat();
+			}
+		});
+		
+		dMultiplayer.toggleChat = function() {
+			$("#chatArea, #chatInput").toggle();
+			chatopen = !chatOpen;
+		}
 		
 		$('#gameDefinition').find('.dialogScreenContainer').append('<div id="coGameDialogScreen3" style="margin-left: 200%; width: 100%; height: 100%; position: absolute; top: 0px;"><div id="coGameBackButton" class="fontCharacterButton icon-arrow-left" style="font-size: 32pt; position: absolute; left: 10px; top: 10px; z-index: 100;"></div><div class="windowTitle">' + 'Co-Develop Game'.dlocalize(modid) + '</div><div class="centeredButtonWrapper" style="margin-top: 20px"><h2><br />' + 'Split costs'.dlocalize(modid) + '</h2><span id="coGameCostComp1" style="float: left; padding-left: 12px;"></span><span id="coGameCostComp2" style="float: right; padding-right: 12px;"></span>' +
 							'<div id="coGameCostSlider"></div><h2>' + 'Split revenue'.dlocalize(modid) + '</h2><span id="coGameRevenueComp1" style="float: left; padding-left: 12px;"></span><span id="coGameRevenueComp2" style="float: right; padding-right: 12px;"></span><div id="coGameRevenueSlider"></div></div><div class="centeredButtonWrapper" style="margin-top: 20px"><h2>' + 'Select company'.dlocalize(modid) + '</h2><div id="coGameTargets" style="height: 156px; overflow-y: auto; margin: 5px 20px 0px 20px;"></div></div><br />' +
@@ -237,9 +252,15 @@ var dMultiplayer =
 							'<br /><hr /><div style="padding: 4px;"><div style="position: relative; top: 10px; left: 6px; float: left;">' + 'Recent servers:'.dlocalize(modid) + ' <select id="browserServerHistory" onchange="dMultiplayer.connectFromHistory()" onkeydown="dMultiplayer.disableKeyboard(event)"><option value="none">' + 'Select...'.dlocalize(modid) + '</option></select></div><div style="position: relative; top: 46px; left: 6px; float: left;"><input type="text" id="DCInput" style="font-size: 16pt; width: 368px;" /></div>' +
 							'<div style="position: relative; left: -594px; top: -38px; float: right; width: 0px;"><div id="browserOfflineButton" class="dialogNextButton baseButton orangeButton">' + 'Play Offline'.dlocalize(modid) + '</div><div id="DCButton" class="dialogNextButton baseButton orangeButton">' + 'Direct Connect'.dlocalize(modid) + '</div></div></div></div>');
 		
-		$('#resources').append('<div id="chatDialog" class="tallWindow windowBorder"><div class="windowTitle">' + 'Chat'.dlocalize(modid) + '</div><div style="margin-top: 20px;"><div class="centeredButtonWrapper"><input type="text" id="chatInput" maxlength="120" style="font-size: 18pt; width: 460px;" />' +
-							'</div></div><div class="centeredButtonWrapper"><div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton">' + 'Send Message'.dlocalize(modid) + '</div></div><br /><br /><div style="position: absolute; left: 50%; bottom: 32px;">' +
-							'<div style="position: relative; left: -50%"><textarea id="chatArea" style="font-size: 8pt; width: 520px; height: 340px;" readonly></textarea><div style="text-align: right;"><input type="checkbox" id="chatOnlyMsgs" name="chatOnlyMsgs" style="width: auto;" /> <label for="chatOnlyMsgs">' + 'Show only chat messages'.dlocalize(modid) + '</label></div></div></div></div>');
+		//$('#resources').append('<div id="chatDialog" class="tallWindow windowBorder"><div class="windowTitle">' + 'Chat'.dlocalize(modid) + '</div><div style="margin-top: 20px;"><div class="centeredButtonWrapper"><input type="text" id="chatInput" maxlength="120" style="font-size: 18pt; width: 460px;" />' +
+		//					'</div></div><div class="centeredButtonWrapper"><div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton">' + 'Send Message'.dlocalize(modid) + '</div></div><br /><br /><div style="position: absolute; left: 50%; bottom: 32px;">' +
+		//					'<div style="position: relative; left: -50%"><textarea id="chatArea" style="font-size: 8pt; width: 520px; height: 340px;" readonly></textarea><div style="text-align: right;"><input type="checkbox" id="chatOnlyMsgs" name="chatOnlyMsgs" style="width: auto;" /> <label for="chatOnlyMsgs">' + 'Show only chat messages'.dlocalize(modid) + '</label></div></div></div></div>');
+		
+		$('#resources').append('<div id="lawsuitDialog" class="tallWindow windowBorder"><div class="dialogScreenContainer tallWindow"><div class="windowTitle">' + 'Lawsuit'.dlocalize(modid) + '</div><div class="dialogBackButton fontCharacterButton icon-arrow-left" style="display: none;"></div><div id="lawsuitCost" class="windowCostLabel" style="font-size: 14pt; width: 200px; text-align: right;">Cash:'.dlocalize(modid) + ' 0</div><br />' +
+					'<div class="dialogScreen1"><br /><div class="centeredButtonWrapper" style="margin-top: 20px"><h2>' + 'Select company'.dlocalize(modid) + '</h2><div id="lawsuitTargets" style="height: 360px; overflow-y: auto; margin: 5px 20px 0px 20px;"></div></div><br /><div id="lawsuitNextButton" class="dialogNextButton baseButton disabledButton">' + 'Next'.dlocalize(modid) + '</div></div>' +
+					'<div class="dialogScreen2"><br /><br /><br /><br /><br /><div class="centeredButtonWrapper" style="margin-top: 20px"><h2 id="lawsuitCashText">' + 'Cash'.dlocalize(modid) + '</h2><div id="lawsuitCashSlider"></div></div>' +
+					'<div class="centeredButtonWrapper" style="margin-top: 20px"><h2>' + 'Type'.dlocalize(modid) + '</h2><div id="lawsuitType" style="height: 156px; overflow-y: auto; margin: 5px 20px 0px 20px;"></div></div><div class="centeredButtonWrapper okButtonWrapper"><div id="lawsuitButton" class="okButton baseButton windowMainActionButton orangeButton windowLargeOkButton">' + 'Make offer'.dlocalize(modid) + '</div></div></div></div></div>');
+
 		
 		$('#resources').append('<div id="tradeDialog" class="tallWindow windowBorder"><div class="dialogScreenContainer tallWindow"><div class="windowTitle">' + 'Trading'.dlocalize(modid) + '</div><div class="dialogBackButton fontCharacterButton icon-arrow-left" style="display: none;"></div><div id="tradeCost" class="windowCostLabel" style="font-size: 14pt; width: 200px; text-align: right;">' + 'Research Points:'.dlocalize(modid) + ' 0<br />' + 'Cash:'.dlocalize(modid) + ' 0</div><br />' +
 							'<div class="dialogScreen1"><br /><div class="centeredButtonWrapper" style="margin-top: 20px"><h2>' + 'Select company'.dlocalize(modid) + '</h2><div id="tradeTargets" style="height: 360px; overflow-y: auto; margin: 5px 20px 0px 20px;"></div></div><br /><div id="tradeNextButton" class="dialogNextButton baseButton disabledButton">' + 'Next'.dlocalize(modid) + '</div></div>' +
@@ -502,17 +523,17 @@ var dMultiplayer =
 					{
 						GameManager.company.researchPoints -= tradeRP;
 						GameManager.company.adjustCash(tradeMoney, "Trade");
-						dMultiplayer.displayMessage("derp1", true);
+						
 					}
 					else if (tradeType == "reqcash" && tradeMoney <= GameManager.company.cash)
 					{
 						GameManager.company.researchPoints += tradeRP;
 						GameManager.company.adjustCash(-tradeMoney, "Trade");
-						dMultiplayer.displayMessage("derp2", true);
+						
 					}
 					VisualsManager.updatePoints();
 					VisualsManager.researchPoints.updatePoints(GameManager.company.researchPoints);
-					dMultiplayer.displayMessage("derp3", true);
+					
 				}
 				dMultiplayer.sendStatus("TRADERES", tradeID + sep + result + sep + tradeType + sep + tradeRP + sep + tradeMoney);
 			}
@@ -4147,7 +4168,7 @@ var dMultiplayer =
 			dMultiplayer.sendStatus("MSG", datatosend);
 			
 			var opprefix = opped ? "@" : "";
-			dMultiplayer.log("<" + opprefix + GameManager.company.staff[0].name + "> " + datatosend, true);
+			//dupe dMultiplayer.log("<" + opprefix + GameManager.company.staff[0].name + "> " + datatosend, true);
 		}
 		else
 		{
