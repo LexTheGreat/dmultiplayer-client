@@ -229,10 +229,10 @@ var dMultiplayer =
 		$('#gameUIContainer').append('<div id="gdtmpchat" onmousedown="dMultiplayer.toggleChat()" style="width: 16px; height: 12px; position: absolute; font: 12px \'Arial\', \'Open Sans\'; border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 492px; bottom: 141px; text-align: center; display: none; cursor: pointer; padding-bottom: 4px; border-radius: 0px 4px 0px 0px;"><img src="./mods/dmultiplayer/img/chat.png" style="position: relative; top: 1px;" /></div>');
 		
 		$('#gameUIContainer').append('<textarea id="chatArea" style="font-size: 8pt; width: 460px; height: 100px; position: absolute;border: 1px solid #181818; background-color: rgba(255, 255, 255, 0.498); left: 40px; bottom: 160px; cursor: default; padding-left: 4px; padding-right: 4px;display: none" readonly></textarea>'); // display: none;
-		$('#gameUIContainer').append('<input type="text" id="chatInput" maxlength="120" style="font-size: 12pt; width: 400px; height: 10px; position: absolute;left: 40px; bottom: 144px;display: none" />');
+		$('#gameUIContainer').append('<input type="text" id="chatInput" maxlength="120" style="font-size: 6pt; width: 400px; height: 10px; position: absolute;left: 40px; bottom: 144px;display: none" />');
 		$('#gameUIContainer').append('<div id="chatButton" class="okButton baseButton disabledButton windowMainActionButton windowLargeOkButton" style="display: none;">' + 'Send Message'.dlocalize(modid) + '</div>');
 
-		$("#id_of_textbox").keyup(function(event) {
+		$("#chatInput").keyup(function(event) {
 			if (event.keyCode === 13) {
 				dMultiplayer.sendChat();
 			}
@@ -299,6 +299,7 @@ var dMultiplayer =
 		$("#advSpyButton").clickExcl(dMultiplayer.advancedSpy);
 		$("#sabotageButton").clickExcl(dMultiplayer.sabotage);
 		$("#tradeButton").clickExcl(dMultiplayer.trade);
+		$("#lawsuitButton").clickExcl(dMultiplayer.lawsuit);
 		
 		$("#sabotageDialog").find(".dialogNextButton").clickExcl(function()
 		{
@@ -344,6 +345,22 @@ var dMultiplayer =
 			$("#tradeDialog").find(".dialogBackButton").fadeIn(200);
 		});
 		
+		$("#lawsuitNextButton").clickExcl(function()
+		{
+			if ($("#lawsuitNextButton").hasClass("disabledButton")) return;
+			
+			Sound.click();
+			$("#lawsuitDialog").find(".dialogScreen1").transition(
+			{
+				"margin-left": "-200%"
+			});
+			$("#lawsuitDialog").find(".dialogScreen2").transition(
+			{
+				"margin-left": "0"
+			});
+			$("#lawsuitDialog").find(".dialogBackButton").fadeIn(200);
+		});
+		
 		$("#tradeDialog").find(".dialogBackButton").clickExcl(function()
 		{
 			Sound.click();
@@ -353,6 +370,20 @@ var dMultiplayer =
 				"margin-left": "0"
 			});
 			$("#tradeDialog").find(".dialogScreen2").transition(
+			{
+				"margin-left": "100%"
+			});
+		});
+		
+		$("#lawsuitDialog").find(".dialogBackButton").clickExcl(function()
+		{
+			Sound.click();
+			$("#lawsuitDialog").find(".dialogBackButton").fadeOut(200);
+			$("#lawsuitDialog").find(".dialogScreen1").transition(
+			{
+				"margin-left": "0"
+			});
+			$("#lawsuitDialog").find(".dialogScreen2").transition(
 			{
 				"margin-left": "100%"
 			});
@@ -539,6 +570,49 @@ var dMultiplayer =
 			}
 		};
 		GDT.addEvent(tradeEvent);
+		
+		lawsuitEvent =
+		{
+			id: "lawsuitEvent",
+			trigger: function()
+			{
+				return false;
+			},
+			getNotification: function(company, id, money)
+			{
+				tradeID = id;
+				tradeMoney = parseInt(money);
+				var request = "{0} cr.".dlocalize(modid).format(UI.getShortNumberString(tradeMoney));
+				
+				var options = isConnected ? ["Accept".dlocalize(modid), "Decline".dlocalize(modid)] : undefined;
+				var buttontext = !isConnected ? "Not connected".dlocalize(modid) : undefined;
+				
+				return new Notification(
+				{
+					sourceId: "lawsuitEvent",
+					header: "{0} want's to sue.".dlocalize(modid).format(company),
+					text: "Damages: {0}".dlocalize(modid).format(request),
+					options: options,
+					buttonText: buttontext
+				});
+			},
+			complete: function(result)
+			{
+				if (!isConnected || tradeID < 0) return;
+				
+				//if (result === 0)
+				//{
+				//	if (tradeType == "reqcash" && tradeMoney <= GameManager.company.cash)
+				//	{
+						GameManager.company.researchPoints += tradeRP;
+						GameManager.company.adjustCash(-tradeMoney, "Lawsuit");
+						
+				//	}
+				//}
+				dMultiplayer.sendStatus("SUERES", tradeID + sep + result + sep + tradeMoney);
+			}
+		};
+		GDT.addEvent(lawsuitEvent);
 		
 		var coTopic;
 		var coGenre;
@@ -948,6 +1022,15 @@ var dMultiplayer =
 		{
 			if (isConnected && UI.getCharUnderCursor() == GameManager.company.staff[0])
 			{
+				items.push(
+				{
+					label: "Lawsuit...".dlocalize(modid),
+					action: function()
+					{
+						Sound.click();
+						dMultiplayer.showLawsuitWindow();
+					}
+				});
 				if (GameManager.company.researchCompleted.indexOf(tradeResearch) > -1)
 				{
 					items.push(
@@ -2984,6 +3067,51 @@ var dMultiplayer =
 						GameManager.company.activeNotifications.addRange(n.split());
 					}
 					break;
+					
+				case "SUEREQ":
+					if (data.length < 3) return;
+					
+					var company = competitors[index].name;
+					var target = data[1];
+					var money = data[2];
+					
+					if (target == playerID && (money <= GameManager.company.cash))
+						GameManager.company.notifications.insertAt(0, lawsuitEvent.getNotification(company, id, money));
+					
+					break;
+					
+				case "SUERES":
+					if (data.length < 4) return;
+					
+					var company = competitors[index].name;
+					var target = data[1];
+					var result = data[2];
+					var money = data[3];
+					
+					if (target == playerID)
+					{
+						var n;
+						//if (result == 0)
+						//{
+							n = new Notification(
+							{
+								header: "{0} Lawsuit".dlocalize(modid).format(company),
+								text: "{0} accepted the lawsuit.\n({1} cr.)".dlocalize(modid).format(company, UI.getShortNumberString(money))
+							});
+
+							GameManager.company.adjustCash(parseInt(money), "Lawsuit");
+						//}
+						//else if (result == 1)
+						//{
+						//	n = new Notification(
+						//	{
+						//		header: "{0} trade".dlocalize(modid).format(company),
+						//		text: "{0} declined the offer.".dlocalize(modid).format(company)
+						//	});
+						//}
+						GameManager.company.activeNotifications.addRange(n.split());
+					}
+					break;
 				
 				case "YOURID":
 					if (data.length < 3 || id != serverID) return;
@@ -3478,6 +3606,93 @@ var dMultiplayer =
 						else return;
 					});
 					$("#tradeType").append(listitem);
+				});
+			},
+			onClose: function()
+			{
+				GameManager.resume(true);
+			}
+		});
+	};
+	
+	dMultiplayer.showLawsuitWindow = function()
+	{
+		if (UI.isModalContentOpen()) return;
+		
+		UI.showModalContent("#lawsuitDialog",
+		{
+			disableCheckForNotifications: true,
+			close: true,
+			onOpen: function()
+			{
+				multiplayerDialogOpen = true;
+
+				
+				var cashMin = 0;
+				var cashMax = GameManager.company.cash > 0 ? GameManager.company.cash : 0;
+				
+				isTargetSelected = false;
+				
+				dMultiplayer.lawsuitSliders(cashMax);
+				
+				$("#lawsuitTargets").empty();
+				competitors.forEach(function(compinarr)
+				{
+					if (compinarr.cash > -1)
+					{
+						var listitem = $("<div class=\"selectableGameFeatureItem\">" + compinarr.name + "</div>");
+						listitem.val(compinarr.id);
+						listitem.clickExcl(function()
+						{
+							if (!listitem.hasClass("selectedFeature"))
+							{
+								$("#lawsuitTargets").find(".selectedFeature").removeClass("selectedFeature");
+								listitem.addClass("selectedFeature");
+								isTargetSelected = true;
+									
+								dMultiplayer.lawsuitSliders(tmin, tmin2);
+								
+								$("#lawsuitNextButton").removeClass("disabledButton").addClass("orangeButton").removeClass("baseButton").addClass("selectorButton");
+							}
+							else
+							{
+								if ($("#lawsuitNextButton").hasClass("orangeButton"))
+									$("#lawsuitNextButton").removeClass("orangeButton").addClass("disabledButton").addClass("baseButton").removeClass("selectorButton");
+								
+								listitem.removeClass("selectedFeature");
+								isTargetSelected = false;
+							}
+						});
+						$("#lawsuitTargets").append(listitem);
+					}
+				});
+				
+				$("#lawsuitType").empty();
+				var options = ["File Lawsuit (FORCE)".dlocalize(modid), "File Lawsuit (VOTE|TODO)".dlocalize(modid)];
+				options.forEach(function(option, i)
+				{
+					var extraclass = i === 0 ? " selectedFeature" : "";
+					
+					var listitem = $("<div class=\"selectableGameFeatureItem" + extraclass + "\">" + option + "</div>");
+					listitem.val(i);
+					listitem.clickExcl(function()
+					{
+						var index = $("#lawsuitTargets").find(".selectedFeature").val();
+						if (!listitem.hasClass("selectedFeature") && (!(listitem.val() == 1 && GameManager.company.cash < 0)))
+						{
+							Sound.click();
+						
+							$("#lawsuitType").find(".selectedFeature").removeClass("selectedFeature");
+							listitem.addClass("selectedFeature");
+							
+							dMultiplayer.lawsuitSliders(tmin, tmin2);
+							
+							if (isTargetSelected && $("#lawsuitNextButton").hasClass("disabledButton"))
+								$("#lawsuitNextButton").removeClass("disabledButton").addClass("orangeButton").removeClass("baseButton").addClass("selectorButton");
+						}
+						else return;
+					});
+					$("#lawsuitType").append(listitem);
 				});
 			},
 			onClose: function()
@@ -4326,6 +4541,46 @@ var dMultiplayer =
 		}
 	};
 	
+	dMultiplayer.lawsuit = function()
+	{
+		if ($("#lawsuitNextButton").hasClass("disabledButton")) return;
+		
+		Sound.click();
+		var competitorindex = dMultiplayer.getObjectArrayIndex(competitors, "id", parseInt($("#tradeTargets").find(".selectedFeature").val()));
+		
+		if (competitorindex !== undefined)
+		{
+			var competitor = competitors[competitorindex];
+			
+			var type = parseInt($("#lawsuitType").find(".selectedFeature").val());
+			
+			switch (type)
+			{
+				case 0:
+					type = "reqrp";
+					break;
+				
+				case 1:
+					type = "reqcash";
+			}
+			
+			var n = new Notification(
+			{
+				header: "{0} Lawsuit".dlocalize(modid).format(competitor.name),
+				text: "The lawsuit has been sent.".dlocalize(modid)
+			});
+			GameManager.company.activeNotifications.addRange(n.split());
+			dMultiplayer.sendStatus("SUEREQ", competitor.id + sep + moneyToPay);
+			
+			UI.closeModal();
+		}
+		else
+		{
+			UI.closeModal();
+			dMultiplayer.showLawsuitWindow();
+		}
+	};
+	
 	dMultiplayer.coDevelopGame = function()
 	{
 		if ($("#coGameButton").hasClass("disabledButton")) return;
@@ -4687,6 +4942,40 @@ var dMultiplayer =
 					moneyToPay = ui.value;
 					$("#tradeCashSlider").slider("value", ui.value);
 					$("#tradeCost").html("Research Points:".dlocalize(modid) + " " + RPToPay + "<br />" + "Cash:".dlocalize(modid) + " " + UI.getShortNumberString(moneyToPay));
+				}
+			}
+		}));
+	};
+	
+	dMultiplayer.lawsuitSliders = function(max)
+	{
+		$("#lawsuitCost").html("Cash:".dlocalize(modid) + " 0");
+		moneyToPay = 0;
+		
+		if (isTargetSelected)
+		{
+			var index = dMultiplayer.getObjectArrayIndex(competitors, "id", parseInt($("#lawsuitTargets").find(".selectedFeature").val()));
+			
+			max = competitors[index].cash;
+			$("#lawsuitCashText").text("Cash (request)".dlocalize(modid));
+		}
+								
+		$("#lawsuitCashSlider").empty();
+		$("#lawsuitCashSlider").append($("<div class=\"budgetSlider\"></div>").slider(
+		{
+			orientation: "horizontal",
+			range: "min",
+			min: 0,
+			max: max,
+			value: 0,
+			animate: "fast",
+			slide: function(event, ui)
+			{
+				if (ui)
+				{
+					moneyToPay = ui.value;
+					$("#lawsuitCashSlider").slider("value", ui.value);
+					$("#lawsuitCost").html("Cash:".dlocalize(modid) + " " + UI.getShortNumberString(moneyToPay));
 				}
 			}
 		}));
