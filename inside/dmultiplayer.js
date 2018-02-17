@@ -604,9 +604,7 @@ var dMultiplayer =
 				//{
 				//	if (tradeType == "reqcash" && tradeMoney <= GameManager.company.cash)
 				//	{
-						GameManager.company.researchPoints += tradeRP;
 						GameManager.company.adjustCash(-tradeMoney, "Lawsuit");
-						
 				//	}
 				//}
 				dMultiplayer.sendStatus("SUERES", tradeID + sep + result + sep + tradeMoney);
@@ -3076,7 +3074,7 @@ var dMultiplayer =
 					var money = data[2];
 					
 					if (target == playerID && (money <= GameManager.company.cash))
-						GameManager.company.notifications.insertAt(0, lawsuitEvent.getNotification(company, id, money));
+						GameManager.company.notifications.insertAt(0, lawsuitEvent.getNotification(company, target, money));
 					
 					break;
 					
@@ -3627,13 +3625,12 @@ var dMultiplayer =
 			{
 				multiplayerDialogOpen = true;
 
-				
 				var cashMin = 0;
 				var cashMax = GameManager.company.cash > 0 ? GameManager.company.cash : 0;
 				
 				isTargetSelected = false;
 				
-				dMultiplayer.lawsuitSliders(cashMax);
+				dMultiplayer.lawsuitSliders(0);
 				
 				$("#lawsuitTargets").empty();
 				competitors.forEach(function(compinarr)
@@ -3678,7 +3675,7 @@ var dMultiplayer =
 					listitem.clickExcl(function()
 					{
 						var index = $("#lawsuitTargets").find(".selectedFeature").val();
-						if (!listitem.hasClass("selectedFeature") && (!(listitem.val() == 1 && GameManager.company.cash < 0)))
+						if (!listitem.hasClass("selectedFeature") && (!(GameManager.company.cash < 0)))
 						{
 							Sound.click();
 						
@@ -4548,6 +4545,12 @@ var dMultiplayer =
 		Sound.click();
 		var competitorindex = dMultiplayer.getObjectArrayIndex(competitors, "id", parseInt($("#tradeTargets").find(".selectedFeature").val()));
 		
+		dMultiplayer.log(parseInt($("#tradeTargets").find(".selectedFeature").val()), true);
+		
+		if (competitorindex == undefined) {
+			competitorindex = playerID;
+		}
+		
 		if (competitorindex !== undefined)
 		{
 			var competitor = competitors[competitorindex];
@@ -4566,7 +4569,6 @@ var dMultiplayer =
 		}
 		else
 		{
-			dMultiplayer.log("debug", true);
 			UI.closeModal();
 			dMultiplayer.showLawsuitWindow();
 		}
